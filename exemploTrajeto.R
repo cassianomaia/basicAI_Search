@@ -46,7 +46,7 @@ source("buscaInformada.R")
 
 inicial <- Trajeto(desc = "A", cidades = transitionmatrix, fun_heuristica = euclideandistance.get)
 objetivo <- Trajeto(cidades = transitionmatrix, fun_heuristica = euclideandistance.get)
-objetivo$desc <- "U"
+objetivo$desc <- "B"
 
 cat("====\tBusca em Largura\t====\n")
 print(unlist(buscaEmLargura(inicial, objetivo)))

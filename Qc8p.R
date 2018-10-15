@@ -1,11 +1,12 @@
 source("Estado.R")
 
-Qc8p <- function(desc=NULL, pai=NULL){
+Qc8p <- function(desc=NULL, pai=NULL, passado=list()){
   
   e <- environment()
   
   assign("desc", desc, envir = e)
   assign("pai", pai, envir = e)
+  assign("passado", passado, envir = e)
   assign("g", 0, envir = e)
   assign("h", Inf, envir = e)
   assign("f", Inf, envir = e)
@@ -63,6 +64,18 @@ heuristica <- function(atual, ...) {
 	return(d_manhattan)
 }
 
+aplicaOperador <-  function(filhosDesc, obj_mat, operador, i, j) {
+	aux_mat <- obj_mat
+	i.novo <- i+operador[1]
+	j.novo <- j+operador[2]
+	aux <- aux_mat[i.novo,j.novo]
+	aux_mat[i.novo,j.novo] <- aux_mat[i,j]
+	aux_mat[i,j] <- aux
+	filhosDesc <- c(filhosDesc, unlist(c(t(aux_mat))))
+	return(filhosDesc)
+}
+
+
 ## Criação do método genérico "geraFilhos"
 ## obj= matrix(c(1, 2, 3, 8, null, 4, 7, 6, 5)
 geraFilhos <- function(obj) {
@@ -72,62 +85,51 @@ geraFilhos <- function(obj) {
 	filhos <- list()
 
 	count_row <- 0
+
 	# posicao da celula vazia
 	i_null <- which(obj_mat == 0, arr.ind=T)[1]
 	j_null <- which(obj_mat == 0, arr.ind=T)[2]
 
-	#print(obj_mat)
+	operadores <- list(
+		c(1,0),		# Operador mover para a esquerada
+		c(-1,0),	# Operador mover para a direita
+		c(0,1),		# Operador mover para cima
+		c(0,-1)		# Operador mover para baixo
+	)
+	
 	if(i_null == 1 || i_null == 2){
-		aux_mat <- obj_mat
-
-		aux <- aux_mat[i_null+1,j_null]
-		aux_mat[i_null+1,j_null] <- aux_mat[i_null,j_null]
-		aux_mat[i_null,j_null] <- aux
-		filhosDesc <- c(filhosDesc, unlist(c(t(aux_mat))))
 		count_row <- count_row + 1
+		filhosDesc <- aplicaOperador(filhosDesc, obj_mat, operadores[[1]], i_null, j_null)
 	}
 	
 	if(i_null == 3 || i_null == 2){
-		aux_mat <- obj_mat
-
-		aux <- aux_mat[i_null-1,j_null]
-		aux_mat[i_null-1,j_null] <- aux_mat[i_null,j_null]
-		aux_mat[i_null,j_null] <- aux
-		filhosDesc <- c(filhosDesc, unlist(c(t(aux_mat))))
 		count_row <- count_row + 1
+		filhosDesc <- aplicaOperador(filhosDesc, obj_mat, operadores[[2]], i_null, j_null)
 	}
 	
 	if(j_null == 1 || j_null == 2){
-		aux_mat <- obj_mat
-		
-		aux <- aux_mat[i_null,1+j_null]
-		aux_mat[i_null,1+j_null] <- aux_mat[i_null,j_null]
-		aux_mat[i_null,j_null] <- aux
-		filhosDesc <- c(filhosDesc, unlist(c(t(aux_mat))))
 		count_row <- count_row + 1
+		filhosDesc <- aplicaOperador(filhosDesc, obj_mat, operadores[[3]], i_null, j_null)
 	}
 	
 	if(j_null == 3 || j_null == 2){
-		aux_mat <- obj_mat
-		
-		aux <- aux_mat[i_null,j_null-1]
-		aux_mat[i_null,j_null-1] <- aux_mat[i_null,j_null]
-		aux_mat[i_null,j_null] <- aux
-		filhosDesc <- c(filhosDesc, unlist(c(t(aux_mat))))
 		count_row <- count_row + 1
+		filhosDesc <- aplicaOperador(filhosDesc, obj_mat, operadores[[4]], i_null, j_null)
 	}
-
-	filhosDesc = matrix(c(filhosDesc), ncol=count_row, nrow=length(desc))
-	#print("Filhos Desc:")
-	#print(filhosDesc)
+	
+	filhosDesc <- matrix(c(filhosDesc), ncol=count_row, nrow=length(desc))
+	print(obj_mat)
+	
 	for(j in 1:ncol(filhosDesc)){
-		filhoDesc <- unlist(filhosDesc[,j])
-		# print(filhoDesc)
-		filho <- Qc8p(desc=filhoDesc, pai=obj)
-		filho$h <- heuristica(filho)
-		filho$g <- 0
-		filho$f <- filho$h
-		filhos <- c(filhos, list(filho))
+		if(!list(unlist(filhosDesc[,j])) %in% obj$passado){
+			filhoDesc <- unlist(filhosDesc[,j])
+			
+			filho <- Qc8p(desc=filhoDesc, pai=obj, passado=c(obj$passado, list(obj$desc)))
+			filho$h <- heuristica(filho)
+			filho$g <- 0
+			filho$f <- filho$h
+			filhos <- c(filhos, list(filho))
+		}
 	}
 
 	return(filhos)

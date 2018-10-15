@@ -37,19 +37,31 @@ heuristica <- function(atual, ...) {
     return(atual$fun_h()[1,atual$desc])
 }
 
+aplicarOperadorIr <- function(filhosDesc, vizinhos) {
+	return(c(
+		filhosDesc,
+		colnames(vizinhos)[apply(vizinhos,1,function(vizinhos){
+			# Descobrir quais são os nós vizinhos
+			# (posições cujo valor é diferente de 0 na matriz de transição de estados)
+			which(vizinhos != 0, arr.ind=T) 
+		})]
+	))
+}
+
 ## Criação do método genérico "geraFilhos"
 geraFilhos <- function(obj) {
     filhosDesc <- list()
 	filhos <- list()
 
 	cidades <- obj$cidades
+
 	vizinhos <- t(cidades[obj$desc,])
 	colnames(vizinhos, do.NULL=FALSE)
 	colnames(vizinhos) <- colnames(cidades)
-	filhosDesc <- c(
-		filhosDesc,
-		colnames(vizinhos)[apply(vizinhos,1,function(vizinhos){which(vizinhos != 0, arr.ind=T)})]
-	)
+
+	# Aplicar o único operador: "ir" para cidade vizinha
+	filhosDesc <- aplicarOperadorIr(filhosDesc, vizinhos)
+
 	for(filhoDesc in filhosDesc){
 		filho <- Trajeto(desc=filhoDesc, pai=obj, fun_h=obj$fun_heuristica, cidades=obj$cidades)
 		filho$h <- heuristica(filho)
