@@ -91,10 +91,10 @@ geraFilhos <- function(obj) {
 	j_null <- which(obj_mat == 0, arr.ind=T)[2]
 
 	operadores <- list(
-		c(1,0),		# Operador mover para a esquerada
-		c(-1,0),	# Operador mover para a direita
-		c(0,1),		# Operador mover para cima
-		c(0,-1)		# Operador mover para baixo
+		c(1,0),		# Operador mover para a direita
+		c(-1,0),	# Operador mover para a esquerda
+		c(0,1),		# Operador mover para baixo
+		c(0,-1)		# Operador mover para cima
 	)
 	
 	if(i_null == 1 || i_null == 2){
