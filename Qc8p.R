@@ -118,7 +118,6 @@ geraFilhos <- function(obj) {
 	}
 	
 	filhosDesc <- matrix(c(filhosDesc), ncol=count_row, nrow=length(desc))
-	print(obj_mat)
 	
 	for(j in 1:ncol(filhosDesc)){
 		if(!list(unlist(filhosDesc[,j])) %in% obj$passado){

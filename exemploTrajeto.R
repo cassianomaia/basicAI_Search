@@ -52,7 +52,7 @@ cat("====\tBusca em Largura\t====\n")
 print(unlist(buscaEmLargura(inicial, objetivo)))
 
 cat("====\tBusca em Profundidade\t=====\n")
-print(buscaEmProfundidade(inicial, objetivo))
+#print(buscaEmProfundidade(inicial, objetivo))
 
 cat("====\tBusca de Custo Uniforme\t=====\n")
 print(buscaCustoUniforme(inicial, objetivo))
